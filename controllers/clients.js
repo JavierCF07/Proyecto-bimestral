@@ -4,7 +4,7 @@ var Client = require('../models/clients');
 
 var bcrypt = require('bcrypt-nodejs')
 
-var jwt = require('../services/jwt');
+var jwte = require('../services/jwte');
 
 var multipary = require('connect-multiparty');
 
@@ -23,16 +23,45 @@ function listar(req,res){
     });
 }
 
+function login(req,res){
+    var params = req.body;
+    var email = params.email;
+    var password = params.password;
+
+    Client.findOne({email: email.toLowerCase()},(err,client)=>{
+        if(err){
+            res.status(500).send({message: 'No puede iniciar sesion'});
+        }else{
+            if(client){
+                bcrypt.compare(password, client.password,(err,check)=>{
+                    if(check){
+                        if(params.gettoken){
+                            res.status(200).send({
+                                token: jwte.createToken(client)
+                            });
+                        }else{
+                            res.status(200).send({client});
+                        }
+                    }else{
+                        res.status(404).send({message: 'El usuario no ha podido loguearse'});
+                    }
+                });
+            }else{
+                res.status(404).send({message: 'No se ha podido encontrar al cliente'});
+            }
+        }
+    });
+}
+
 function saveClient(req,res){
     var client = new Client();
     var params = req.body;
 
-    if(params.name && params.password){
+    if(params.email && params.password){
         client.name = params.name;
         client.surname = params.surname;
-        client.email = params.surname;
+        client.email = params.email;
         client.role = params.role;
-        client.role = "CLIENT";
 
         Client.findOne({email: client.email.toLowerCase()},(err, issetClient)=>{
             if(err){
@@ -75,8 +104,7 @@ function editClient(req,res){
             if(!edit){
                 res.status(404).send({message: 'El cliente no existe o no coincide con su identificador'});
             }else{
-                res.status(200).send({edit}); 
-                console.log(id);
+                res.status(200).send({edit});
             }
         }
     });
@@ -102,6 +130,7 @@ module.exports = {
     prueba,
     saveClient,
     editClient,
-    dropClient,
-    listar
+    dropClient, 
+    listar,
+    login
 }

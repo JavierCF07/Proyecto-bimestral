@@ -1,6 +1,7 @@
 'use strict'
 
 var Category = require('../models/categories');
+var Product = require('../models/products');
 
 var jwt = require('../services/jwt');
 var bcrypt = require('bcrypt-nodejs');
@@ -15,6 +16,7 @@ function saveCategories(req,res){
 
     if(params.name){
         category.name = params.name;
+
 
         Category.findOne({name: category.name},(err,issetCategory)=>{
             if(err){
@@ -75,6 +77,27 @@ function dropCategory(req,res){
     });
 }
 
+function EliminarPorDefault(req,res){
+    var id = req.params.id;
+
+    //console.log(req.category.sub);
+
+    Category.findByIdAndDelete(id,(err,dele)=>{
+        if(Category == null){
+            params.product.category = '5c7c11af4cb02d101cb5826f';
+        }
+        if(err){
+            res.status(500).send({message: 'No puede eliminar la categoria'});
+        }else{
+            if(!dele){
+                res.status(404).send({message: 'Asegurese que la categoria que quiere eliminar coincida con su id'});
+            }else{
+                res.status(200).send({message: 'Categoria eliminada correctamente'});
+            }
+        }
+    });
+}
+
 function listar(req,res){
     Category.find({},(err,list)=>{
         if(err){
@@ -91,5 +114,6 @@ module.exports = {
     listar,
     saveCategories,
     editCategory,
-    dropCategory
+    dropCategory,
+    EliminarPorDefault
 }

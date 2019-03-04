@@ -135,7 +135,6 @@ function dropAdmin(req, res) {
 //--------------------------------------------------Client---------------------------------------------------
 
 function editClient(req, res) {
-    //var client = new Client();
     var id = req.params.id;
     var update = req.body;
     var role = req.client.role;

@@ -8,6 +8,7 @@ var ProductController = require('../controllers/products');
 
 var md_auth = require('../middlewares/authenticated');
 var md_aut = require('../middlewares/authenticateded');
+var md_a = require('../middlewares/authenticatededed');
 
 var multipary = require('connect-multiparty');
 
@@ -35,11 +36,13 @@ api.put('/ACT/:id',md_aut.ensureAut,AdminController.editClient);
 //----------------------------------------------Category-------------------------------------------
 api.get('/listarCategoria',CategoryController.listar);
 
-api.post('/agregarCategoria',CategoryController.saveCategories);
+api.post('/agregarCategoria',md_a.ensureAut,CategoryController.saveCategories);
 
 api.put('/actualizarCategoria/:id',CategoryController.editCategory);
 
 api.delete('/eliminarCategoria/:id',CategoryController.dropCategory);
+
+api.get('/eli/:id',CategoryController.EliminarPorDefault);
 
 //----------------------------------------------Product--------------------------------------------
 
